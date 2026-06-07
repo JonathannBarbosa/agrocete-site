@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-dir="raizes">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saber+Agro — Agrocete</title>
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/pages.css">
+</head>
+<body data-page="saber">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-hero" data-screen-label="Saber+Agro / Hero">
+    <div class="wrap">
+      <div class="eyebrow reveal">Saber+Agro</div>
+      <h1 class="reveal" data-d="1">Conhecimento que vai <span class="accent-word">a campo.</span></h1>
+      <p class="lead reveal" data-d="2">Conteúdos técnicos, manejo, sustentabilidade e bastidores da Agrocete para apoiar suas decisões na lavoura.</p>
+      <div class="prod-filters reveal" data-d="2" style="margin-top:28px">
+        <button class="on">Tudo</button>
+        <button>Manejo</button>
+        <button>Nutrição</button>
+        <button>Biológicos</button>
+        <button>Sustentabilidade</button>
+        <button>Pessoas</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight" style="padding-top:0">
+    <div class="wrap">
+      <!-- Featured -->
+      <article class="post feat feat-post reveal" style="margin-bottom:24px">
+        <div class="p-media" style="min-height:340px"><image-slot id="sb-feat" src="https://agrocete-site.s3.sa-east-1.amazonaws.com/images/landing_pages/33_ZbYtIvnjDnzfcyv.webp" placeholder="Imagem em destaque"></image-slot></div>
+        <div class="p-body" style="padding:clamp(28px,4vw,52px);justify-content:center">
+          <span class="p-date">08 JAN 2026 · Manejo</span>
+          <h3 style="font-size:clamp(1.6rem,2.6vw,2.3rem)">Fitotoxidade: o quanto você perde da sua lavoura de soja</h3>
+          <p>A fitotoxidade é um problema comum nas lavouras de soja, mas muitas vezes subestimado. Esse efeito, causado por aplicações mal conduzidas ou produtos incompatíveis, pode comprometer o potencial produtivo da área.</p>
+          <a href="#" class="link-arrow p-link">Ler artigo
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <div class="blog-grid" id="postGrid"></div>
+    </div>
+  </section>
+
+  <section class="section--tight" style="padding-bottom:clamp(56px,7vw,110px)">
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Receba o Saber+Agro no seu e-mail.</h2>
+        <p>Conteúdos técnicos e novidades da Agrocete, direto para você.</p>
+        <a href="contato.html" class="btn btn-accent btn-lg">Quero receber
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="image-slot.js"></script>
+<script src="js/site.js"></script>
+<script>
+  // post list: 2 reais + temas editoriais (placeholders a substituir)
+  var POSTS=[
+    {d:"05 JAN 2026",c:"Pessoas",t:"Agrocete na 100ª Corrida Internacional de São Silvestre"},
+    {d:"09 DEZ 2025",c:"Sustentabilidade",t:"Selo Clima Paraná reforça nosso compromisso com a sustentabilidade"},
+    {d:"21 NOV 2025",c:"Biológicos",t:"Tratamento de sementes: como os biológicos fortalecem o arranque"},
+    {d:"30 OUT 2025",c:"Nutrição",t:"Matéria seca: por que a fase de crescimento define a colheita"},
+    {d:"12 OUT 2025",c:"Manejo",t:"Tecnologia de aplicação: extraindo o máximo de cada pulverização"},
+    {d:"28 SET 2025",c:"Biológicos",t:"Fixação biológica de nitrogênio na prática"}
+  ];
+  var IMGS=[
+    "https://agrocete-site.s3.sa-east-1.amazonaws.com/images/landing_pages/34_Jtu9b8WarrKBtBj.webp",
+    "https://agrocete-site.s3.sa-east-1.amazonaws.com/images/landing_pages/35_KlY97dez1qcLjOy.webp",
+    "https://agrocete-site.s3.sa-east-1.amazonaws.com/images/seos/1_2BsYC7oDROuNaKC.png",
+    "https://agrocete-site.s3.sa-east-1.amazonaws.com/images/landing_pages/35_KlY97dez1qcLjOy.webp",
+    "https://agrocete-site.s3.sa-east-1.amazonaws.com/images/landing_pages/33_ZbYtIvnjDnzfcyv.webp",
+    "https://agrocete-site.s3.sa-east-1.amazonaws.com/images/landing_pages/34_Jtu9b8WarrKBtBj.webp"
+  ];
+  var grid=document.getElementById('postGrid');
+  POSTS.forEach(function(p,i){
+    grid.insertAdjacentHTML('beforeend',
+      '<article class="post reveal" data-d="'+((i%3)+1)+'">'+
+        '<div class="p-media"><image-slot id="sb-'+i+'" src="'+IMGS[i%IMGS.length]+'" placeholder="Imagem do artigo"></image-slot></div>'+
+        '<div class="p-body">'+
+          '<span class="p-date">'+p.d+' · '+p.c+'</span>'+
+          '<h3>'+p.t+'</h3>'+
+          '<a href="#" class="link-arrow p-link" style="margin-top:auto">Ler artigo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>'+
+        '</div>'+
+      '</article>');
+  });
+</script>
+</body>
+</html>

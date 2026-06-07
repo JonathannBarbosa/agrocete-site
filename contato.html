@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-dir="raizes">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contato — Agrocete</title>
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/pages.css">
+</head>
+<body data-page="contato">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-hero" data-screen-label="Contato / Hero">
+    <div class="wrap">
+      <div class="eyebrow reveal">Fale conosco</div>
+      <h1 class="reveal" data-d="1">Vamos construir <span class="accent-word">produtividade juntos?</span></h1>
+      <p class="lead reveal" data-d="2">Para esclarecer dúvidas, sugestões, fazer reclamações ou obter informações, fale com a Agrocete. Respondemos o quanto antes.</p>
+    </div>
+  </section>
+
+  <section class="section--tight" style="padding-top:8px;padding-bottom:clamp(56px,7vw,110px)">
+    <div class="wrap">
+      <div class="contact-grid">
+        <!-- Form -->
+        <form class="reveal" id="contactForm" novalidate>
+          <div class="field">
+            <label for="nome">Nome completo</label>
+            <input type="text" id="nome" name="nome" placeholder="Seu nome" required>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" name="email" placeholder="voce@email.com" required>
+            </div>
+            <div class="field">
+              <label for="fone">Telefone</label>
+              <input type="tel" id="fone" name="fone" placeholder="(00) 00000-0000">
+            </div>
+          </div>
+          <div class="field">
+            <label for="assunto">Assunto</label>
+            <select id="assunto" name="assunto">
+              <option>Quero falar com um especialista</option>
+              <option>Sou distribuidor / revenda</option>
+              <option>Imprensa</option>
+              <option>Trabalhe conosco</option>
+              <option>Outro assunto</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="msg">Mensagem</label>
+            <textarea id="msg" name="msg" rows="5" placeholder="Como podemos ajudar?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center">Enviar mensagem
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <p id="formMsg" style="margin-top:14px;font-size:.9rem;color:var(--green-deep);display:none">Obrigado! Recebemos sua mensagem e retornaremos em breve.</p>
+        </form>
+
+        <!-- Info -->
+        <aside class="contact-info reveal" data-d="1">
+          <h3>Agrocete</h3>
+          <div class="ci-row">
+            <span class="ci-ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+            <div><b>Endereço</b><span>Rua Anna Scremin, nº 800<br>Distrito Industrial, Ponta Grossa/PR</span></div>
+          </div>
+          <div class="ci-row">
+            <span class="ci-ico"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></span>
+            <div><b>Telefone</b><span>+55 (42) 3228-1229</span></div>
+          </div>
+          <div class="ci-row">
+            <span class="ci-ico"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg></span>
+            <div><b>E-mail</b><span>contato@agrocete.com.br</span></div>
+          </div>
+          <div class="ci-row">
+            <span class="ci-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <div><b>Atendimento</b><span>Segunda a sexta, 8h às 18h</span></div>
+          </div>
+          <div style="margin-top:28px">
+            <div class="social">
+              <a href="https://www.instagram.com/agrocetebrasil/" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.8.07 1.2.06 1.8.25 2.2.42.6.22 1 .48 1.4.9.43.42.7.82.92 1.4.17.42.36 1 .42 2.2.05 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.8-.42 2.2-.22.6-.49 1-.92 1.4-.42.43-.8.7-1.4.92-.42.17-1 .36-2.2.42-1.2.05-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.8-.25-2.2-.42-.6-.22-1-.49-1.4-.92-.43-.42-.7-.8-.92-1.4-.17-.42-.36-1-.42-2.2C2.21 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.8.42-2.2.22-.6.49-1 .92-1.4.42-.43.8-.7 1.4-.92.42-.17 1-.36 2.2-.42C8.4 2.21 8.8 2.2 12 2.2Zm0 3.07A6.73 6.73 0 1 0 18.73 12 6.73 6.73 0 0 0 12 5.27Zm0 11.1A4.37 4.37 0 1 1 16.37 12 4.37 4.37 0 0 1 12 16.37Zm6.99-11.4a1.57 1.57 0 1 1-1.57-1.56 1.57 1.57 0 0 1 1.57 1.57Z"/></svg></a>
+              <a href="https://www.linkedin.com/company/agrocete/" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.5 8.5h4V24h-4V8.5ZM8 8.5h3.83v2.1h.06a4.2 4.2 0 0 1 3.78-2.08c4.04 0 4.79 2.66 4.79 6.12V24h-4v-6.6c0-1.57-.03-3.6-2.2-3.6s-2.53 1.72-2.53 3.49V24H8V8.5Z"/></svg></a>
+              <a href="https://www.facebook.com/agrocete/" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12a12 12 0 1 0-13.88 11.85v-8.38H7.08V12h3.04V9.36c0-3 1.79-4.67 4.53-4.67 1.31 0 2.69.24 2.69.24v2.95h-1.52c-1.49 0-1.96.93-1.96 1.87V12h3.33l-.53 3.47h-2.8v8.38A12 12 0 0 0 24 12Z"/></svg></a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="image-slot.js"></script>
+<script src="js/site.js"></script>
+<script>
+  document.getElementById('contactForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var ok=this.checkValidity();
+    if(!ok){ this.reportValidity&&this.reportValidity(); return; }
+    document.getElementById('formMsg').style.display='block';
+    this.reset();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-dir="raizes">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Produtos — Agrocete</title>
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/pages.css">
+</head>
+<body data-page="produtos">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-hero" data-screen-label="Produtos / Hero">
+    <div class="wrap">
+      <div class="eyebrow reveal">Conheça nossos produtos</div>
+      <h1 class="reveal" data-d="1">A linha <span class="accent-word">GRAP</span>, para cada decisão da safra.</h1>
+      <p class="lead reveal" data-d="2">Biológicos, nutrição, fisiologia vegetal e adjuvantes, organizados pelas fases da Construção da Produtividade.</p>
+    </div>
+  </section>
+
+  <section class="section--tight" style="padding-top:0">
+    <div class="wrap">
+      <div class="prod-filters reveal" id="filters">
+        <button class="on" data-f="all">Todas as linhas</button>
+        <button data-f="clay"><span class="dot" style="color:var(--clay)"></span>&nbsp;Plantio & enraizamento</button>
+        <button data-f="leaf"><span class="dot" style="color:var(--leaf)"></span>&nbsp;Arranque & crescimento</button>
+        <button data-f="tech"><span class="dot" style="color:var(--sky)"></span>&nbsp;Tecnologia de aplicação</button>
+      </div>
+      <div class="prod-grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="section--tight" style="padding-bottom:clamp(56px,7vw,110px)">
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Qual produto é ideal para a sua área?</h2>
+        <p>Fale com um especialista Agrocete e monte o programa certo para cada fase da sua lavoura.</p>
+        <a href="contato.html" class="btn btn-accent btn-lg">Falar com especialista
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="image-slot.js"></script>
+<script src="js/site.js"></script>
+<script src="js/products.js"></script>
+<script>
+  (function(){
+    var grid=document.getElementById('grid');
+    function render(filter){
+      grid.innerHTML='';
+      AGRO_PRODUCTS.filter(function(p){return filter==='all'||p.line===filter;})
+        .forEach(function(p){ grid.insertAdjacentHTML('beforeend', window.productCard(p)); });
+      // reveal immediately (motion handled globally)
+      if(document.documentElement.getAttribute('data-motion')==='off')
+        grid.querySelectorAll('.reveal').forEach(function(e){e.classList.add('in')});
+      else grid.querySelectorAll('.reveal').forEach(function(e){setTimeout(function(){e.classList.add('in')},30)});
+    }
+    document.querySelectorAll('#filters button').forEach(function(b){
+      b.addEventListener('click', function(){
+        document.querySelectorAll('#filters button').forEach(function(x){x.classList.remove('on')});
+        b.classList.add('on'); render(b.getAttribute('data-f'));
+      });
+    });
+    render('all');
+  })();
+</script>
+</body>
+</html>
