@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Roda Cíclica — Construção da Produtividade</title>
+<style>
+
+  :root{
+    --font-display: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-body: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-label: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --display-weight:600; --display-tracking:-0.022em;
+    --ease:cubic-bezier(.22,.61,.36,1);
+
+    --page-bg:
+      radial-gradient(circle at 16% 10%, rgba(4,79,139,.06), transparent 26%),
+      radial-gradient(circle at 90% 6%, rgba(10,132,255,.05), transparent 22%),
+      linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%);
+    --text:#172230; --muted:#4C5A68; --faint:#8A95A3;
+    --accent:#044F8B; --accent-ink:#06335C;
+    --hairline:rgba(18,42,78,.12);
+
+    --panel-bg:rgba(255,255,255,.72); --panel-border:rgba(18,42,78,.10);
+    --panel-shadow:0 1px 1px rgba(10,35,70,.04), 0 12px 34px -18px rgba(10,35,70,.28);
+    --panel-blur:saturate(180%) blur(20px);
+    --card-blur:saturate(160%) blur(12px);
+
+    --chip-bg:rgba(4,79,139,.08); --chip-border:rgba(4,79,139,.18); --chip-text:#06335C;
+    --input-bg:rgba(118,138,160,.14); --input-border:transparent; --focus-ring:rgba(4,79,139,.20);
+    --btn-bg:#044F8B; --btn-text:#FFFFFF; --btn-pad:12px 18px;
+    --btn2-bg:rgba(118,138,160,.16); --btn2-border:transparent;
+    --card-bg:rgba(255,255,255,.66); --card-border:rgba(18,42,78,.08); --card-title:#06335C; --card-text:#2A3744;
+    --tooltip-bg:rgba(255,255,255,.82); --tooltip-border:rgba(18,42,78,.12); --tooltip-text:#172230; --tooltip-sub:#4C5A68;
+
+    --label-fill:#FFFFFF; --center-title-fill:#06335C; --center-sub-fill:#4C5A68;
+    --glow-soft:rgba(10,132,255,.20); --glow-strong:rgba(10,132,255,.32);
+
+    --radius-panel:22px; --radius-card:18px; --radius-control:12px; --radius-chip:999px;
+    --h1-size:31px; --dim-opacity:0.24; --active-bright:1.10; --selected-bright:1.18;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--page-bg);
+    background-attachment: fixed;
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .wrap {
+    max-width: 1600px; margin: 0 auto; padding: 20px;
+    display: grid; grid-template-columns: minmax(680px, 1.2fr) minmax(360px, .8fr);
+    gap: 18px; min-height: 100vh;
+  }
+  .panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--panel-shadow);
+    overflow: hidden; position: relative;
+    backdrop-filter: var(--panel-blur, none);
+    -webkit-backdrop-filter: var(--panel-blur, none);
+  }
+  .left-panel { display: grid; grid-template-rows: auto 1fr auto; }
+  .header { padding: 22px 24px 12px; border-bottom: 1px solid var(--hairline); }
+  .eyebrow {
+    color: var(--accent-ink); font-size: 12px; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    font-family: var(--font-label, var(--font-body));
+  }
+  h1 {
+    margin: 8px 0 8px; font-size: var(--h1-size, 28px); line-height: 1.05;
+    font-family: var(--font-display); font-weight: var(--display-weight, 700);
+    letter-spacing: var(--display-tracking, -0.01em); color: var(--text);
+  }
+  .sub { margin: 0; color: var(--muted); font-size: 15px; max-width: 860px; }
+  .wheel-wrap { padding: 8px 20px 0; display: grid; place-items: center; position: relative; }
+  #wheel { width: min(100%, 920px); height: min(78vh, 920px); display: block; }
+  .helper {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 0 24px 22px; color: var(--muted); font-size: 13px;
+  }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; }
+  .legend .pill, .chip {
+    background: var(--chip-bg); border: 1px solid var(--chip-border);
+    color: var(--chip-text); border-radius: var(--radius-chip, 999px);
+    padding: 8px 12px; font-size: 12px; line-height: 1; white-space: nowrap;
+  }
+  .legend .pill strong { color: var(--accent-ink); }
+  .right-panel { display: grid; grid-template-rows: auto auto 1fr auto; }
+  .toolbar { padding: 18px 20px 14px; display: grid; gap: 12px; border-bottom: 1px solid var(--hairline); }
+  .search { display: flex; gap: 10px; }
+  .search input {
+    flex: 1; background: var(--input-bg); border: 1px solid var(--input-border);
+    color: var(--text); border-radius: var(--radius-control); padding: 14px 14px;
+    font-size: 14px; outline: none; font-family: var(--font-body);
+  }
+  .search input::placeholder { color: var(--faint); }
+  .search input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--focus-ring); }
+  button {
+    cursor: pointer; border: 0; border-radius: var(--radius-control);
+    padding: var(--btn-pad, 12px 14px); background: var(--btn-bg); color: var(--btn-text);
+    font-weight: 600; font-family: var(--font-body);
+    transition: transform .18s var(--ease, ease), filter .18s, background .18s;
+  }
+  button:hover { filter: brightness(1.05); }
+  button:active { transform: translateY(1px); }
+  button.secondary { background: var(--btn2-bg); border: 1px solid var(--btn2-border); color: var(--text); }
+  .selection { padding: 0 20px 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .selection .chip button {
+    padding: 0; background: transparent; border: 0; margin-left: 8px;
+    font-size: 12px; color: var(--accent-ink);
+  }
+  .content { padding: 16px 20px 20px; overflow: auto; }
+  .content h2 {
+    margin: 0 0 10px; font-size: 24px; line-height: 1.1;
+    font-family: var(--font-display); font-weight: var(--display-weight, 700);
+    letter-spacing: var(--display-tracking, -0.01em);
+  }
+  .content p.lead { margin: 0 0 16px; color: var(--muted); }
+  .cards { display: grid; gap: 12px; }
+  .card {
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: var(--radius-card); padding: 14px 14px;
+    backdrop-filter: var(--card-blur, none); -webkit-backdrop-filter: var(--card-blur, none);
+  }
+  .card h3 { margin: 0 0 8px; font-size: 15px; color: var(--card-title); }
+  .card ul { margin: 0; padding-left: 18px; color: var(--text); }
+  .card li { margin: 0 0 6px; color: var(--card-text); }
+  .list-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .list-chips .chip { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+  .list-chips .chip:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px var(--chip-border), 0 8px 20px var(--glow-soft); }
+  .footer-note { padding: 12px 20px 18px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--hairline); }
+  .tooltip {
+    position: fixed; z-index: 10; pointer-events: none;
+    background: var(--tooltip-bg); border: 1px solid var(--tooltip-border);
+    color: var(--tooltip-text); border-radius: 12px; padding: 10px 12px;
+    font-size: 12px; box-shadow: var(--panel-shadow); max-width: 280px;
+    opacity: 0; transform: translateY(6px); transition: opacity .12s ease, transform .12s ease;
+    backdrop-filter: var(--panel-blur, none); -webkit-backdrop-filter: var(--panel-blur, none);
+  }
+  .tooltip.show { opacity: 1; transform: translateY(0); }
+  .tt-sub { margin-top: 4px; color: var(--tooltip-sub); }
+  .svg-label { font-size: 10px; fill: var(--label-fill); user-select: none; pointer-events: none; letter-spacing: 0.01em; }
+  .svg-label.small { font-size: 8px; fill: var(--label-fill); opacity: .85; }
+  .center-title { text-anchor: middle; fill: var(--center-title-fill); font-weight: 800; letter-spacing: .05em; font-family: var(--font-display); }
+  .center-sub { text-anchor: middle; fill: var(--center-sub-fill); font-size: 12px; }
+  .ring-segment { cursor: pointer; transition: filter .15s ease, transform .15s ease, opacity .15s ease; }
+  .ring-segment.dim { opacity: var(--dim-opacity, 0.26); }
+  .ring-segment.active {
+    filter: drop-shadow(0 0 7px var(--glow-strong)) drop-shadow(0 0 16px var(--glow-soft)) brightness(var(--active-bright, 1.18));
+  }
+  .ring-segment.selected {
+    filter: drop-shadow(0 0 10px var(--glow-strong)) drop-shadow(0 0 24px var(--glow-soft)) brightness(var(--selected-bright, 1.3));
+  }
+  .ring-segment:hover { filter: drop-shadow(0 0 10px var(--glow-soft)) brightness(1.12); }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+  .muted { color: var(--muted); }
+  .tag {
+    display: inline-block; background: var(--chip-bg); color: var(--chip-text);
+    border: 1px solid var(--chip-border); padding: 4px 8px; border-radius: 999px;
+    font-size: 11px; margin-right: 6px; margin-bottom: 6px;
+  }
+  @media (max-width: 1180px) {
+    .wrap { grid-template-columns: 1fr; }
+    #wheel { height: min(70vh, 860px); }
+  }
+  /* --- Touch / mobile / totem (aditivo) --- */
+  #wheel { touch-action: manipulation; }
+  .ring-segment { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+  @media (hover: none) {
+    .list-chips .chip:hover { transform: none; box-shadow: none; }
+    .ring-segment:hover { filter: none; }
+    .tooltip { display: none !important; }
+  }
+  @media (max-width: 720px) {
+    .wrap { padding: 12px; gap: 12px; }
+    .header { padding: 16px 16px 10px; }
+    h1 { font-size: 22px; }
+    .sub { font-size: 13px; }
+    #wheel { height: min(86vw, 560px); }
+    .toolbar { padding: 14px 14px 12px; }
+    .search { flex-wrap: wrap; }
+    .search input { flex: 1 1 100%; }
+    .search button { flex: 1; }
+    .content { padding: 14px 14px 18px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .list-chips .chip, .selection .chip { padding: 10px 14px; font-size: 13px; }
+    button { padding: 14px 16px; }
+  }
+
+  /* controles em cápsula e tipografia da plataforma */
+  button { border-radius: 999px; font-weight: 600; }
+  .eyebrow { letter-spacing: .14em; font-weight: 600; }
+  .selection .chip { padding: 7px 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="panel left-panel">
+    <div class="header">
+      <div class="eyebrow">Ferramenta interativa</div>
+      <h1>Construção da Produtividade</h1>
+      <p class="sub">Clique em uma cultura, um estádio, uma dor ou um produto. A roda realça os demais anéis e o painel ao lado mostra o próximo passo do manejo.</p>
+    </div>
+    <div class="wheel-wrap">
+      <svg id="wheel" viewBox="0 0 900 900" aria-label="Roda cíclica"></svg>
+    </div>
+    <div class="helper">
+      <div class="legend">
+        <span class="pill"><strong>Anel 1</strong> Cultura</span>
+        <span class="pill"><strong>Anel 2</strong> Estádio 🌱</span>
+        <span class="pill"><strong>Anel 3</strong> Dor ⚠️</span>
+        <span class="pill"><strong>Anel 4</strong> Produto 🧪</span>
+      </div>
+      <div>Os anéis ficam em azul escuro. Quando filtrados, brilham com highlight forte.</div>
+    </div>
+  </section>
+
+  <aside class="panel right-panel">
+    <div class="toolbar">
+      <div class="search">
+        <input id="searchInput" type="text" placeholder="Buscar por cultura, estádio, dor ou produto..." />
+        <button id="searchBtn">Buscar</button>
+        <button id="resetBtn" class="secondary">Limpar</button>
+      </div>
+      <div class="muted">A busca usa os aliases da planilha. Exemplos: <span class="tag">raiz fraca</span><span class="tag">r1</span><span class="tag">st pro</span><span class="tag">cana soqueira</span></div>
+    </div>
+    <div id="selectionChips" class="selection"></div>
+    <div id="content" class="content"></div>
+    <div class="footer-note">Base carregada de roda-ciclica-data.js (gerado da planilha). Visual pensado para leitura rápida, navegação por clique e highlight cruzado entre anéis.</div>
+  </aside>
+</div>
+<div id="tooltip" class="tooltip"></div>
+
+<script src="roda-ciclica-data.js"></script>
+<script>
+const DATA = window.RODA_DATA;
+if (!DATA) {
+  document.getElementById('content').innerHTML =
+    '<h2>Dados não carregados</h2><p class="lead">O arquivo <code>roda-ciclica-data.js</code> não foi encontrado ao lado desta página. Rode <code>python tools/gerar_roda_data.py</code> para gerá-lo.</p>';
+  throw new Error('RODA_DATA ausente');
+}
+const state = {
+  cultureId: null,
+  stageId: null,
+  dorId: null,
+  productId: null
+};
+
+const svg = document.getElementById('wheel');
+const content = document.getElementById('content');
+const selectionChips = document.getElementById('selectionChips');
+const tooltip = document.getElementById('tooltip');
+const searchInput = document.getElementById('searchInput');
+
+const ringPalette = {
+  base: ['#0A5FA6','#044F8B','#0B6BB5','#073F70','#1277C0'],
+  glow: '#0A84FF',
+  center: '#FFFFFF'
+};
+
+const cultureOrder = DATA.cultures.map(c=>c.id);
+const allStages = [...DATA.stages].sort((a,b)=> a.cultureId.localeCompare(b.cultureId) || a.order - b.order);
+const allDors = [...DATA.dors];
+const allProducts = [...DATA.products];
+
+const stageNameById = Object.fromEntries(DATA.stages.map(s => [s.id, s.name]));
+const cultureNameById = Object.fromEntries(DATA.cultures.map(c => [c.id, c.name]));
+const dorNameById = Object.fromEntries(DATA.dors.map(d => [d.id, d.name]));
+const productNameById = Object.fromEntries(DATA.products.map(p => [p.id, p.name]));
+
+function normalize(text) {
+  return (text || '')
+    .toString()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function shortProduct(name) {
+  return name.replace(/^GRAP\s+/i,'').replace(/\s*\/\s*PULVEREASY NR/i,' / NR');
+}
+
+function makeArcPath(cx, cy, r0, r1, startAngle, endAngle) {
+  const p = (r, a) => {
+    const rad = (a - 90) * Math.PI/180;
+    return [cx + Math.cos(rad)*r, cy + Math.sin(rad)*r];
+  };
+  const [x0, y0] = p(r1, startAngle);
+  const [x1, y1] = p(r1, endAngle);
+  const [x2, y2] = p(r0, endAngle);
+  const [x3, y3] = p(r0, startAngle);
+  const large = endAngle - startAngle > 180 ? 1 : 0;
+  return `M ${x0} ${y0} A ${r1} ${r1} 0 ${large} 1 ${x1} ${y1} L ${x2} ${y2} A ${r0} ${r0} 0 ${large} 0 ${x3} ${y3} Z`;
+}
+
+function labelTransform(cx, cy, radius, startAngle, endAngle) {
+  const mid = (startAngle + endAngle)/2;
+  const rad = (mid - 90) * Math.PI/180;
+  const x = cx + Math.cos(rad)*radius;
+  const y = cy + Math.sin(rad)*radius;
+  let rot = mid;
+  if (mid > 180) rot = mid + 180;
+  return `translate(${x} ${y}) rotate(${rot})`;
+}
+
+function splitPipe(value) {
+  return (value || '').toString().split('|').map(v => v.trim()).filter(Boolean);
+}
+
+function currentRelationships() {
+  return DATA.relationships.filter(rel =>
+    (!state.cultureId || rel.cultureId === state.cultureId) &&
+    (!state.stageId || rel.stageId === state.stageId) &&
+    (!state.dorId || rel.dorId === state.dorId) &&
+    (!state.productId || rel.productId === state.productId)
+  );
+}
+
+function relatedSets() {
+  const rels = currentRelationships();
+  return {
+    rels,
+    cultureIds: new Set(rels.map(r => r.cultureId)),
+    stageIds: new Set(rels.map(r => r.stageId)),
+    dorIds: new Set(rels.map(r => r.dorId)),
+    productIds: new Set(rels.map(r => r.productId))
+  };
+}
+
+function visibleStages() {
+  if (state.cultureId) {
+    return allStages.filter(s => s.cultureId === state.cultureId);
+  }
+  return allStages;
+}
+
+function visibleProducts() {
+  const rels = DATA.relationships.filter(rel =>
+    (!state.cultureId || rel.cultureId === state.cultureId) &&
+    (!state.stageId || rel.stageId === state.stageId) &&
+    (!state.dorId || rel.dorId === state.dorId)
+  );
+  const ids = [...new Set(rels.map(r => r.productId))];
+  if (ids.length) {
+    return allProducts.filter(p => ids.includes(p.id));
+  }
+  return allProducts;
+}
+
+function selectionLabel() {
+  const parts = [];
+  if (state.cultureId) parts.push({type:'cultureId', id:state.cultureId, label:cultureNameById[state.cultureId]});
+  if (state.stageId) parts.push({type:'stageId', id:state.stageId, label:stageNameById[state.stageId]});
+  if (state.dorId) parts.push({type:'dorId', id:state.dorId, label:dorNameById[state.dorId]});
+  if (state.productId) parts.push({type:'productId', id:state.productId, label:productNameById[state.productId]});
+  return parts;
+}
+
+function clearState() {
+  state.cultureId = null;
+  state.stageId = null;
+  state.dorId = null;
+  state.productId = null;
+}
+
+function setSelection(type, id) {
+  if (state[type] === id) {
+    state[type] = null;
+  } else {
+    state[type] = id;
+  }
+  enforceConsistency(type);
+  render();
+}
+
+function enforceConsistency(lastChanged) {
+  // Estádio e cultura precisam ser coerentes.
+  if (state.stageId) {
+    const stageCulture = DATA.stages.find(s => s.id === state.stageId)?.cultureId;
+    if (stageCulture) {
+      if (lastChanged === 'cultureId' && state.cultureId && state.cultureId !== stageCulture) {
+        state.stageId = null;
+      } else {
+        state.cultureId = stageCulture;
+      }
+    }
+  }
+  const matches = () => DATA.relationships.some(rel =>
+    (!state.cultureId || rel.cultureId === state.cultureId) &&
+    (!state.stageId   || rel.stageId   === state.stageId) &&
+    (!state.dorId     || rel.dorId     === state.dorId) &&
+    (!state.productId || rel.productId === state.productId)
+  );
+  if (matches()) return;
+  // A seleção recém-clicada é o novo foco e nunca é descartada.
+  const order = ['productId', 'dorId', 'stageId', 'cultureId'];
+  for (const key of order) {
+    if (key === lastChanged) continue;
+    if (!state[key]) continue;
+    if (key === 'cultureId' && state.stageId) continue;
+    state[key] = null;
+    if (matches()) return;
+  }
+  if (!matches() && state.productId && state.cultureId &&
+      DATA.cardProduto[`${state.productId}__${state.cultureId}`]) {
+    return;
+  }
+}
+
+function renderSelectionChips() {
+  const parts = selectionLabel();
+  selectionChips.innerHTML = '';
+  parts.forEach(p => {
+    const span = document.createElement('span');
+    span.className = 'chip';
+    span.innerHTML = `${p.label} <button aria-label="Remover">×</button>`;
+    span.querySelector('button').onclick = () => {
+      state[p.type] = null;
+      render();
+    };
+    selectionChips.appendChild(span);
+  });
+}
+
+function scoreTop(list, key) {
+  const map = new Map();
+  list.forEach(item => {
+    const prev = map.get(item[key]) || 0;
+    map.set(item[key], prev + (4 - Math.min(3, Number(item.priority)||3)));
+  });
+  return [...map.entries()].sort((a,b)=>b[1]-a[1]).map(([id])=>id);
+}
+
+function clickableChip(label, onClick) {
+  return `<span class="chip" data-clickable="1">${label}</span>`;
+}
+
+function renderIntro() {
+  const rels = DATA.relationships;
+  const cultureCount = DATA.cultures.length;
+  const stageCount = DATA.stages.length;
+  const productCount = DATA.products.length;
+  content.innerHTML = `
+    <h2>Entre pela porta que fizer mais sentido</h2>
+    <p class="lead">Você pode começar por cultura, estádio, dor ou produto. A roda acende os caminhos relacionados e o painel mostra a leitura do manejo.</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Como usar</h3>
+        <ul>
+          <li>Clique em <strong>cultura</strong> para abrir os estádios daquela lavoura.</li>
+          <li>Clique em <strong>estádio</strong> para ver prioridades da planta, dores e produtos do momento.</li>
+          <li>Clique em <strong>dor</strong> para entender como reconhecer, causas e produtos ligados a ela.</li>
+          <li>Clique em <strong>produto</strong> para ver o card técnico por cultura.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Base atual</h3>
+        <ul>
+          <li><strong>${cultureCount}</strong> culturas ativas</li>
+          <li><strong>${stageCount}</strong> estádios mapeados</li>
+          <li><strong>${DATA.dors.length}</strong> macrodores</li>
+          <li><strong>${productCount}</strong> produtos conectados</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cards" style="margin-top:12px;">
+      <div class="card">
+        <h3>Atalhos úteis</h3>
+        <div class="list-chips">
+          <span class="chip quick" data-type="cultureId" data-id="SOJA">SOJA</span>
+          <span class="chip quick" data-type="cultureId" data-id="MILHO">MILHO</span>
+          <span class="chip quick" data-type="cultureId" data-id="ALGODAO">ALGODÃO</span>
+          <span class="chip quick" data-type="cultureId" data-id="CANA_PLANTA">CANA (planta)</span>
+          <span class="chip quick" data-type="cultureId" data-id="CANA_SOQUEIRA">CANA (soqueira)</span>
+        </div>
+      </div>
+    </div>
+  `;
+  content.querySelectorAll('.quick').forEach(el => {
+    el.onclick = () => setSelection(el.dataset.type, el.dataset.id);
+  });
+}
+
+function renderCulturePanel(cultureId) {
+  const culture = DATA.cultures.find(c => c.id === cultureId);
+  const stages = DATA.stages.filter(s => s.cultureId === cultureId).sort((a,b)=>a.order-b.order);
+  const rels = DATA.relationships.filter(r => r.cultureId===cultureId);
+  const topDors = scoreTop(rels,'dorId').slice(0,5);
+  const topProducts = scoreTop(rels,'productId').slice(0,5);
+  content.innerHTML = `
+    <h2>${culture.name}</h2>
+    <p class="lead">Em que estádio está sua planta? Escolha um momento da cultura para abrir o próximo passo do manejo.</p>
+    <div class="card">
+      <h3>Estádios disponíveis</h3>
+      <div class="list-chips">
+        ${stages.map(s => `<span class="chip stage-jump" data-id="${s.id}">${s.name}</span>`).join('')}
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:12px;">
+      <div class="card">
+        <h3>Macrodores mais recorrentes</h3>
+        <div class="list-chips">
+          ${topDors.map(id => `<span class="chip dor-jump" data-id="${id}">${dorNameById[id]}</span>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <h3>Produtos mais conectados</h3>
+        <div class="list-chips">
+          ${topProducts.map(id => `<span class="chip prod-jump" data-id="${id}">${shortProduct(productNameById[id])}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  bindPanelJumps();
+}
+
+function renderStagePanel(stageId) {
+  const info = DATA.conteudoEstagio[stageId];
+  const stage = DATA.stages.find(s => s.id === stageId);
+  const rels = DATA.relationships.filter(r =>
+    r.stageId === stageId &&
+    (!state.cultureId || r.cultureId === state.cultureId)
+  ).sort((a,b)=>a.priority-b.priority);
+  const topProducts = [...new Map(rels.map(r => [r.productId, r])).values()].slice(0,4);
+  const topDors = [...new Set(rels.map(r => r.dorId))].slice(0,4);
+  const title = info?.TITULO_PAINEL || `${cultureNameById[stage.cultureId]} — ${stage.name}`;
+  content.innerHTML = `
+    <h2>${title}</h2>
+    <p class="lead">Leitura rápida do momento da planta e do que merece atenção neste ponto do manejo.</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>O que a planta prioriza agora</h3>
+        <ul>
+          <li>${info?.PLANTA_PRIORIZA_1 || '—'}</li>
+          <li>${info?.PLANTA_PRIORIZA_2 || '—'}</li>
+          <li>${info?.PLANTA_PRIORIZA_3 || '—'}</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Top dores do estádio</h3>
+        <div class="list-chips">
+          ${topDors.map(id => `<span class="chip dor-jump" data-id="${id}">${dorNameById[id]}</span>`).join('') || '<span class="muted">Sem dores mapeadas.</span>'}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <h3>Top recomendações</h3>
+      <div class="cards">
+        ${topProducts.map((r, idx) => `
+          <div class="card">
+            <h3>${productNameById[r.productId]}</h3>
+            <div class="muted">${info?.['POR_QUE_' + (idx+1)] || r.why}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:12px;">
+      <div class="card">
+        <h3>Como usar</h3>
+        <p>${info?.COMO_USAR || 'Conforme a estratégia de posicionamento da cultura.'}</p>
+      </div>
+      <div class="card">
+        <h3>O que observar</h3>
+        <p>${info?.ALERTAS || 'Observe resposta da planta, uniformidade e coerência com o objetivo do manejo.'}</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <h3>Continuar o ciclo</h3>
+      <div class="list-chips">
+        ${topDors.map(id => `<span class="chip dor-jump" data-id="${id}">Ver dor</span>`).join('')}
+        ${topProducts.map(r => `<span class="chip prod-jump" data-id="${r.productId}">Ver produto</span>`).join('')}
+      </div>
+    </div>
+  `;
+  bindPanelJumps();
+}
+
+function renderDorPanel(dorId) {
+  const dor = DATA.dors.find(d => d.id === dorId);
+  const info = DATA.conteudoDor[dorId] || {};
+  const stageIds = splitPipe(info.ESTADIOS_CRITICOS_IDS);
+  const prodIds = splitPipe(info.PRODUTOS_RECOMENDADOS_IDS);
+  content.innerHTML = `
+    <h2>${dor.name}</h2>
+    <p class="lead">${dor.desc || 'Dor agronômica priorizada na roda.'}</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Como reconhecer</h3>
+        <p>${info.COMO_RECONHECER || '—'}</p>
+      </div>
+      <div class="card">
+        <h3>Causas prováveis</h3>
+        <p>${info.CAUSAS_PROVAVEIS || '—'}</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <h3>Estádios críticos</h3>
+      <div class="list-chips">
+        ${stageIds.map(id => `<span class="chip stage-jump" data-id="${id}">${stageNameById[id] || id}</span>`).join('') || '<span class="muted">Sem estágios críticos mapeados.</span>'}
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <h3>Produtos recomendados</h3>
+      <div class="list-chips">
+        ${prodIds.map(id => `<span class="chip prod-jump" data-id="${id}">${productNameById[id] || id}</span>`).join('') || '<span class="muted">Sem produtos mapeados.</span>'}
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <h3>O que observar no campo</h3>
+      <p>${info.O_QUE_OBSERVAR_NO_CAMPO || '—'}</p>
+    </div>
+  `;
+  bindPanelJumps();
+}
+
+function renderProductPanel(productId) {
+  const product = DATA.products.find(p => p.id === productId);
+  let cultureId = state.cultureId;
+  if (!cultureId) {
+    const keys = Object.keys(DATA.cardProduto).filter(k => k.startsWith(productId + '__'));
+    if (keys.length) cultureId = keys[0].split('__')[1];
+  }
+  const card = cultureId ? DATA.cardProduto[`${productId}__${cultureId}`] : null;
+  const availableCultures = Object.keys(DATA.cardProduto)
+    .filter(k => k.startsWith(productId + '__'))
+    .map(k => k.split('__')[1]);
+  if (!card) {
+    content.innerHTML = `
+      <h2>${product.name}</h2>
+      <p class="lead">Selecione uma cultura para ver o card completo deste produto.</p>
+      <div class="card">
+        <h3>Culturas com card disponível</h3>
+        <div class="list-chips">
+          ${availableCultures.map(id => `<span class="chip culture-jump" data-id="${id}">${cultureNameById[id]}</span>`).join('') || '<span class="muted">Nenhum card encontrado.</span>'}
+        </div>
+      </div>
+    `;
+    bindPanelJumps();
+    return;
+  }
+  content.innerHTML = `
+    <h2>${product.name}</h2>
+    <p class="lead">${cultureNameById[cultureId]} · Card técnico do produto dentro da cultura selecionada.</p>
+    <div class="cards">
+      <div class="card"><h3>Dor agronômica</h3><p>${card.DOR_AGRONOMICA || '—'}</p></div>
+      <div class="card"><h3>Onde entra no manejo</h3><p>${card.ONDE_ENTRA_NO_MANEJO || '—'}</p></div>
+      <div class="card"><h3>Função técnica</h3><p>${card.FUNCAO_TECNICA || '—'}</p></div>
+      <div class="card"><h3>Mecanismo agronômico</h3><p>${card.MECANISMO_AGRONOMICO || '—'}</p></div>
+      <div class="card"><h3>Resposta no campo</h3><p>${card.RESPOSTA_NO_CAMPO || '—'}</p></div>
+      <div class="card"><h3>Ganho esperado</h3><p>${card.GANHO_ESPERADO || '—'}</p></div>
+      <div class="card"><h3>Recomendação de uso</h3><p>${card.RECOMENDACAO_DE_USO || '—'}</p></div>
+      <div class="grid-2">
+        <div class="card"><h3>Dose</h3><p>${card.DOSE || '—'}</p></div>
+        <div class="card"><h3>Alertas</h3><p>${card.ALERTAS || '—'}</p></div>
+      </div>
+    </div>
+  `;
+}
+
+function bindPanelJumps() {
+  content.querySelectorAll('.stage-jump').forEach(el => el.onclick = () => setSelection('stageId', el.dataset.id));
+  content.querySelectorAll('.dor-jump').forEach(el => el.onclick = () => setSelection('dorId', el.dataset.id));
+  content.querySelectorAll('.prod-jump').forEach(el => el.onclick = () => setSelection('productId', el.dataset.id));
+  content.querySelectorAll('.culture-jump').forEach(el => el.onclick = () => setSelection('cultureId', el.dataset.id));
+}
+
+function renderContent() {
+  if (state.productId) return renderProductPanel(state.productId);
+  if (state.dorId) return renderDorPanel(state.dorId);
+  if (state.stageId) return renderStagePanel(state.stageId);
+  if (state.cultureId) return renderCulturePanel(state.cultureId);
+  return renderIntro();
+}
+
+function drawRing(items, radiusInner, radiusOuter, keyName, selectedId, activeIds, labelMode='name') {
+  const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const gap = 1.4;
+  const total = items.length || 1;
+  const step = 360 / total;
+  if (!items.length) {
+    const ph = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    ph.setAttribute('d', makeArcPath(450, 450, radiusInner, radiusOuter, 0.001, 359.999));
+    ph.setAttribute('fill', ringPalette.base[0]);
+    ph.setAttribute('opacity', selectionLabel().length ? '0.12' : '0.22');
+    group.appendChild(ph);
+    return group;
+  }
+
+  items.forEach((item, idx) => {
+    const start = idx * step + gap/2;
+    const end = (idx + 1) * step - gap/2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', makeArcPath(450, 450, radiusInner, radiusOuter, start, end));
+    const baseFill = ringPalette.base[idx % ringPalette.base.length];
+    path.setAttribute('fill', baseFill);
+    path.setAttribute('stroke', 'rgba(255,255,255,0.55)');
+    path.setAttribute('stroke-width', '1');
+    path.classList.add('ring-segment');
+    if (selectedId === item.id) path.classList.add('selected');
+    else if (activeIds.has(item.id)) path.classList.add('active');
+    else if (selectionLabel().length) path.classList.add('dim');
+
+    const mapType = {cultureId:'cultureId', stageId:'stageId', dorId:'dorId', productId:'productId'};
+    const key = mapType[keyName];
+    path.addEventListener('click', () => setSelection(keyName, item.id));
+    path.addEventListener('mousemove', (e) => showTooltip(e, item, keyName));
+    path.addEventListener('mouseleave', hideTooltip);
+    group.appendChild(path);
+
+    const arcSize = end - start;
+    if (arcSize > 8 || total <= 12) {
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('class', 'svg-label' + (total > 14 ? ' small' : ''));
+      label.setAttribute('transform', labelTransform(450,450,(radiusInner+radiusOuter)/2,start,end));
+      label.setAttribute('text-anchor', 'middle');
+      let txt = item.name;
+      if (keyName === 'productId') txt = shortProduct(item.name);
+      if (keyName === 'cultureId' && item.name.startsWith('CANA')) txt = item.name.replace('CANA ','');
+      if (keyName === 'dorId' && txt.length > 18) txt = txt.slice(0,16) + '…';
+      if (keyName === 'productId' && txt.length > 16) txt = txt.slice(0,14) + '…';
+      label.textContent = txt;
+      group.appendChild(label);
+    }
+  });
+  return group;
+}
+
+function showTooltip(e, item, keyName) {
+  let title = item.name;
+  let sub = '';
+  if (keyName === 'stageId') sub = cultureNameById[item.cultureId];
+  if (keyName === 'dorId') sub = item.desc || item.category || '';
+  if (keyName === 'productId') sub = item.category || '';
+  tooltip.innerHTML = `<strong>${title}</strong>${sub ? `<div class="tt-sub">${sub}</div>` : ''}`;
+  tooltip.style.left = (e.clientX + 16) + 'px';
+  tooltip.style.top = (e.clientY + 16) + 'px';
+  tooltip.classList.add('show');
+}
+function hideTooltip() { tooltip.classList.remove('show'); }
+
+function renderWheel() {
+  svg.innerHTML = '';
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="75%" stop-color="#F2F6FB"/>
+      <stop offset="100%" stop-color="#E7EEF6"/>
+    </radialGradient>
+  `;
+  svg.appendChild(defs);
+
+  const sets = relatedSets();
+
+  const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  bgCircle.setAttribute('cx', 450); bgCircle.setAttribute('cy', 450); bgCircle.setAttribute('r', 90);
+  bgCircle.setAttribute('fill', 'url(#centerGlow)');
+  bgCircle.setAttribute('stroke', 'rgba(4,79,139,0.30)');
+  bgCircle.setAttribute('stroke-width', '1.2');
+  svg.appendChild(bgCircle);
+
+  const centerTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  centerTitle.setAttribute('x', 450); centerTitle.setAttribute('y', 425);
+  centerTitle.setAttribute('class', 'center-title'); centerTitle.setAttribute('font-size','18');
+  centerTitle.textContent = 'CONSTRUÇÃO';
+  svg.appendChild(centerTitle);
+
+  const centerTitle2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  centerTitle2.setAttribute('x', 450); centerTitle2.setAttribute('y', 450);
+  centerTitle2.setAttribute('class', 'center-title'); centerTitle2.setAttribute('font-size','18');
+  centerTitle2.textContent = 'DA';
+  svg.appendChild(centerTitle2);
+
+  const centerTitle3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  centerTitle3.setAttribute('x', 450); centerTitle3.setAttribute('y', 475);
+  centerTitle3.setAttribute('class', 'center-title'); centerTitle3.setAttribute('font-size','18');
+  centerTitle3.textContent = 'PRODUTIVIDADE';
+  svg.appendChild(centerTitle3);
+
+  const centerSub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  centerSub.setAttribute('x', 450); centerSub.setAttribute('y', 518);
+  centerSub.setAttribute('class', 'center-sub');
+  centerSub.textContent = selectionLabel().length ? 'Os demais anéis brilham conforme o filtro.' : 'Entre por estádio, dor ou produto.';
+  svg.appendChild(centerSub);
+
+  svg.appendChild(drawRing(DATA.cultures, 110, 182, 'cultureId', state.cultureId, sets.cultureIds));
+  svg.appendChild(drawRing(visibleStages(), 193, 282, 'stageId', state.stageId, sets.stageIds));
+  svg.appendChild(drawRing(DATA.dors, 293, 372, 'dorId', state.dorId, sets.dorIds));
+  svg.appendChild(drawRing(visibleProducts(), 383, 440, 'productId', state.productId, sets.productIds));
+}
+
+function render() {
+  renderWheel();
+  renderSelectionChips();
+  renderContent();
+}
+
+function searchAlias(term) {
+  const q = normalize(term);
+  if (!q) return null;
+  const alias = DATA.aliases.find(a => normalize(a.TERMO_DIGITADO) === q) || DATA.aliases.find(a => normalize(a.TERMO_DIGITADO).includes(q));
+  if (alias) return alias;
+  const directCulture = DATA.cultures.find(c => normalize(c.name) === q);
+  if (directCulture) return {TIPO_REFERENCIA:'CULTURA', REFERENCIA_ID: directCulture.id};
+  const directStage = DATA.stages.find(s => normalize(s.name) === q);
+  if (directStage) return {TIPO_REFERENCIA:'ESTADIO', REFERENCIA_ID: directStage.id};
+  const directDor = DATA.dors.find(d => normalize(d.name) === q);
+  if (directDor) return {TIPO_REFERENCIA:'DOR', REFERENCIA_ID: directDor.id};
+  const directProduct = DATA.products.find(p => normalize(p.name) === q);
+  if (directProduct) return {TIPO_REFERENCIA:'PRODUTO', REFERENCIA_ID: directProduct.id};
+  return null;
+}
+
+function applyAliasResult(alias) {
+  if (!alias) return;
+  const typeMap = {
+    CULTURA: 'cultureId',
+    ESTADIO: 'stageId',
+    DOR: 'dorId',
+    PRODUTO: 'productId'
+  };
+  const t = typeMap[alias.TIPO_REFERENCIA];
+  if (t) setSelection(t, alias.REFERENCIA_ID);
+}
+
+document.getElementById('searchBtn').onclick = () => {
+  const alias = searchAlias(searchInput.value);
+  if (alias) {
+    applyAliasResult(alias);
+  } else {
+    searchInput.value = '';
+    searchInput.placeholder = 'Nada encontrado. Tente outro termo.';
+    setTimeout(() => searchInput.placeholder = 'Buscar por cultura, estádio, dor ou produto...', 1800);
+  }
+};
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('searchBtn').click();
+});
+document.getElementById('resetBtn').onclick = () => {
+  clearState();
+  searchInput.value = '';
+  render();
+};
+
+render();
+</script>
+</body>
+</html>
